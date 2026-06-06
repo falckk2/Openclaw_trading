@@ -1,5 +1,11 @@
 # Blofin Trading Bot — Project Progress
 
+## GitHub
+- **Repo:** https://github.com/falckk2/Openclaw_trading
+- **Status:** Committed and pushed (force-pushed to remove secret from history)
+- **Branches:** master
+- **Secrets:** config/config.yaml NOT committed (in .gitignore)
+
 ## Token Budget
 - **Session start:** 2026-06-06T18:58:00Z
 - **5-hour limit:** ~416k tokens
