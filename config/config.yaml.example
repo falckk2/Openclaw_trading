@@ -1,0 +1,64 @@
+# BloFin Demo Trading Configuration
+# Copy this file to config.yaml and fill in your credentials
+
+exchange:
+  # Set demo=True for paper trading, False for live
+  demo: true
+  paper_trading: true
+
+  # BloFin API credentials
+  # Get these from https://blofin.com/account/apis
+  api_key: "7478d761de254a21bd1437f56dd8a7c6"
+  api_secret: "aabe6c53a23e4256982e8c0119e4ff19"
+  passphrase: "qazwsxedc"
+
+market:
+  # Default trading pair
+  default_symbol: "BTC-USDT"
+
+  # Available symbols for demo trading:
+  # - BTC-USDT, ETH-USDT, SOL-USDT, etc.
+  # Check /uapi/v1/market/instruments for full list
+
+  # Default candle interval
+  default_interval: "1H"
+
+  # Default order book depth
+  default_depth: 20
+
+trading:
+  # Default order sizes
+  min_size: 0.001
+  max_size: 10.0
+
+  # Risk parameters
+  max_position_size: 1.0      # Max contracts per position
+  max_total_exposure: 5.0     # Max total exposure in USDT
+  default_stop_loss_pct: 2.0    # Stop loss as % of entry
+  default_take_profit_pct: 5.0 # Take profit as % of entry
+
+strategies:
+  # Enable/disable strategy modules
+  grid:
+    enabled: true
+    grid_spacing_pct: 1.0      # Grid spacing in %
+    num_levels: 5 # Number of grid levels
+
+  mean_reversion:
+    enabled: true
+    lookback_period: 20         # Candles to look back
+    std_dev_threshold: 2.0      # Entry threshold
+
+  rsi_bollinger:
+    enabled: true
+    rsi_period: 14
+    rsi_oversold: 30
+    rsi_overbought: 70
+    bb_period: 20
+    bb_std: 2
+
+logging:
+  level: "INFO"
+  trade_log: "logs/trades.log"
+  perf_log: "logs/performance.log"
+  issue_log: "logs/issues.log"

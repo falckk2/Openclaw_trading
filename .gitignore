@@ -9,4 +9,7 @@ token_budget.json
 *.egg-info/
 dist/
 build/
-.DS_Storeconfig.yaml
+.DS_Store
+
+# Config with secrets — DO NOT COMMIT
+config/config.yaml
