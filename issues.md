@@ -1,0 +1,216 @@
+# Issues Log — Blofin Trading Bot
+
+## Format
+Each issue follows this structure:
+
+```markdown
+## [ISSUE-XXX] Title
+- **Status:** Open | In Progress | Resolved | Deferred
+- **Severity:** Critical | High | Medium | Low | Info
+- **Agent:** Architect | Engineer | BugFinder | Debugger | Parent
+- **Created:** YYYY-MM-DD HH:MM UTC
+- **Location:** file:line or module:function
+- **Description:** What the issue is.
+- **Root Cause:** (if known)
+- **Resolution:** (if resolved)
+- **Notes:** Additional context.
+```
+
+## Categories (each agent owns their domain)
+- **Architect:** Design, architecture, SOLID violations, structure
+- **Engineer:** Implementation, code quality, style
+- **BugFinder:** Bugs found, anomalies, unexpected behavior
+- **Debugger:** Issue resolution, fixes applied
+- **Parent:** Fixes applied by main agent (direct fixes)
+
+---
+
+## Open Issues
+
+
+---
+
+## Resolved Issues
+
+## [ISSUE-002] OrderResponse missing `quantity` field
+- **Status:** Resolved
+- **Severity:** Critical
+- **Agent:** BugFinder → Parent (direct fix)
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** src/exchange/base.py:OrderResponse
+- **Description:** OrderResponse dataclass was missing `quantity` field. All code that constructed OrderResponse (paper trading, real API) and code that accessed `order.quantity` (order_manager) would fail with AttributeError.
+- **Root Cause:** Architect designed the interface but omitted `quantity` from OrderResponse.
+- **Resolution:** Added `quantity: float` field to OrderResponse in base.py. Updated all OrderResponse constructors in blofin_client.py and all test files. Fixed by Parent agent.
+- **Notes:** All paper trading OrderResponse constructions now include quantity=order.quantity.
+
+## [ISSUE-004] Position.get_pnl_pct() uses stale unrealized_pnl
+- **Status:** Resolved
+- **Severity:** Medium
+- **Agent:** BugFinder → Parent (direct fix)
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** src/trading/position.py:get_pnl_pct
+- **Description:** get_pnl_pct() returned unrealized_pnl / cost * 100, but unrealized_pnl is only updated when update_price() is called. If update_price() wasn't called after the last price change, the percentage was wrong (showed 0%).
+- **Root Cause:** get_pnl_pct() relied on self.unrealized_pnl instead of computing from current state.
+- **Resolution:** Rewrote get_pnl_pct() to compute PnL directly from current_price, entry_price, side, and quantity without relying on the cached unrealized_pnl field.
+- **Notes:** Test now passes without needing to call update_price() first.
+
+## [ISSUE-001] MeanReversionStrategy missing __init__
+- **Status:** Resolved
+- **Severity:** High
+- **Agent:** BugFinder → Parent (direct fix)
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** src/strategies/ml/mean_reversion.py
+- **Description:** MeanReversionStrategy had no __init__ method. Strategy base class had no __init__ either, but validate() and generate_signal() referenced self._config which was never set. TypeError: takes no arguments.
+- **Root Cause:** Architect didn't add __init__ to base Strategy class, and MeanReversionStrategy didn't store config.
+- **Resolution:** Added __init__(self, config) to Strategy base class that stores self._config = config. MeanReversionStrategy now calls super().__init__(config).
+- **Notes:** RSIBollingerStrategy also references self._config — base class __init__ fix covers it.
+
+## [ISSUE-003] FeatureBuilder column_stack dimension mismatch
+- **Status:** Resolved
+- **Severity:** High
+- **Agent:** BugFinder → Parent (direct fix)
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** src/models/features/feature_builder.py
+- **Description:** build_features() tried to column_stack arrays of different sizes. Price arrays (closes, highs, lows, volumes) had N elements. Feature arrays (_returns, _volatility, _rsi) had N-1 elements (np.diff produces N-1 output). _moving_average had N elements. ValueError on column_stack.
+- **Root Cause:** np.diff returns N-1 elements, but code assumed all arrays had same length.
+- **Resolution:** Padded _returns, _volatility, _rsi with a leading element (0 for returns/volatility, 50 for RSI neutral) to make them N elements. _moving_average already N elements — no padding needed.
+- **Notes:** Test expects 50 rows × 8 columns from 50 candles. Now correct.
+
+## [ISSUE-007] OrderManager.get_open_orders with symbol doesn't filter by status
+- **Status:** Resolved
+- **Severity:** High
+- **Agent:** BugFinder → Parent (direct fix)
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** src/trading/order_manager.py:get_open_orders
+- **Description:** When get_open_orders(symbol="BTCUSDT") was called, it returned ALL orders for that symbol including filled/cancelled ones. Only the no-symbol variant filtered by status. Test expected filled orders to be excluded.
+- **Root Cause:** Symbol-filtered branch had no status filter: `return [self._orders[oid] for oid in order_ids if oid in self._orders]`
+- **Resolution:** Added status filter to symbol branch: `and self._orders[oid].status not in ("filled", "cancelled")`
+- **Notes:** Now both branches filter consistently.
+
+## [ISSUE-INFO-01] Literal import missing in engine.py
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (direct fix)
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** src/trading/engine.py
+- **Description:** NameError: name 'Literal' is not defined. Type hint used Literal but import was missing.
+- **Root Cause:** Architect used Literal in type hints but forgot to import from typing.
+- **Resolution:** Added `from typing import Literal` to engine.py imports.
+
+## [ISSUE-INFO-02] numpy not installed in environment
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (direct fix)
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** environment
+- **Description:** ModuleNotFoundError: No module named 'numpy'. Tests couldn't import numpy-dependent modules.
+- **Resolution:** Installed numpy with --break-system-packages flag.
+
+## [ISSUE-INFO-03] datetime.utcnow() deprecation warnings
+- **Status:** Deferred
+- **Severity:** Low
+- **Agent:** —
+- **Created:** 2026-06-06 19:xx UTC
+- **Location:** Multiple files (50+ warnings)
+- **Description:** datetime.utcnow() deprecated in Python 3.12+. All strategies and tests use it. Should replace with datetime.now(datetime.UTC).
+- **Resolution:** Deferred — not blocking, 67 deprecation warnings but tests pass.
+- **Notes:** Easy fix for Engineer in next session.
+
+---
+
+## [ISSUE-008] Demo API key is web-only, not API-compatible
+- **Status:** Open
+- **Severity:** High
+- **Agent:** Engineer (this session)
+- **Created:** 2026-06-06 20:xx UTC
+- **Location:** config/config.yaml + Blofin account
+- **Description:** The API key provided returns "Access key does not exist" (code 152401) when calling authenticated endpoints (/api/v1/account/balance). The key works for demo web trading UI but not for API access. Demo API keys may need to be generated specifically for API use from blofin.com/account/apis.
+- **Root Cause:** Demo account keys generated from the web UI may only work for web trading, not API authentication.
+- **Resolution:** Pending — user needs to generate API-compatible demo keys from Blofin.
+- **Notes:** Paper trading (simulated, no real API calls) works fine. Market data (candles) works via public endpoint. Only authenticated account endpoints are blocked.
+
+## [ISSUE-009] Endpoint path prefix was wrong (/uapi/v1/ vs /api/v1/)
+- **Status:** Resolved
+- **Severity:** Critical
+- **Agent:** Engineer (this session) → Parent (direct fix)
+- **Created:** 2026-06-06 20:xx UTC
+- **Location:** src/exchange/blofin_client.py
+- **Description:** All API endpoints were prefixed with /uapi/v1/ but the correct prefix is /api/v1/. This caused all API calls to return 404.
+- **Root Cause:** Architect/Engineer used wrong API path prefix.
+- **Resolution:** Changed all endpoint constants from /uapi/v1/ to /api/v1/. Fixed by Parent agent.
+
+## [ISSUE-010] Candle data format was array, not dict
+- **Status:** Resolved
+- **Severity:** High
+- **Agent:** Engineer (this session) → Parent (direct fix)
+- **Created:** 2026-06-06 20:xx UTC
+- **Location:** src/exchange/blofin_client.py:get_candles
+- **Description:** BloFin API returns candle data as arrays [ts, open, high, low, close, vol, ...] not as dicts with named keys. Code was calling c.get("ts") etc. which always returned default.
+- **Root Cause:** Assumed dict format; API actually returns array format.
+- **Resolution:** Updated get_candles to use array indices: c[0]=ts, c[1]=open, c[2]=high, c[3]=low, c[4]=close, c[5]=vol.
+
+## [ISSUE-011] Ticker and orderbook endpoints don't exist in BloFin API
+- **Status:** Resolved
+- **Severity:** Medium
+- **Agent:** Engineer (this session) → Parent (direct fix)
+- **Created:** 2026-06-06 20:xx UTC
+- **Location:** src/exchange/blofin_client.py:get_ticker, get_order_book
+- **Description:** /api/v1/market/ticker and /api/v1/market/orderbook return 404. These endpoints don't exist in the BloFin API.
+- **Resolution:** get_ticker now derives price from last candle close. get_order_book returns empty OrderBook (placeholder). Strategies relying on orderbook may need adjustment.
+
+## [ISSUE-012] API success code is "0" not 200
+- **Status:** Resolved
+- **Severity:** High
+- **Agent:** Engineer (this session) → Parent (direct fix)
+- **Created:** 2026-06-06 20:xx UTC
+- **Location:** src/exchange/blofin_client.py:_handle_response
+- **Description:** _handle_response checked `code != 200` for errors, but BloFin API returns `{"code": "0", "msg": "success"}` for successful calls. This caused all successful API responses to be treated as errors.
+- **Root Cause:** Wrong success code check.
+- **Resolution:** Changed check to `code != "0" and code != 200 and code != 0`.
+## [ISSUE-008] Paper trading order IDs not unique (same millisecond timestamp)
+- **Status:** Resolved
+- **Severity:** Medium
+- **Agent:** Parent (direct fix)
+- **Created:** 2026-06-06 20:42 UTC
+- **Location:** src/exchange/blofin_client.py:225
+- **Description:** Paper trading order IDs used `int(time.time() * 1000)` — two orders placed in the same millisecond got the same ID.
+- **Root Cause:** Timestamp-based ID generation without uniqueness guarantee.
+- **Resolution:** Changed to `uuid.uuid4().hex[:13]` for globally unique IDs. Also added `self._paper_orders` dict to store order history and `get_order_by_id()` method.
+- **Notes:** Paper trading now tracks all orders in memory and can retrieve them by ID.
+
+## [ISSUE-009] `get_order_by_id` method missing from BlofinClient
+- **Status:** Resolved
+- **Severity:** Medium
+- **Agent:** Parent (direct fix)
+- **Created:** 2026-06-06 20:42 UTC
+- **Location:** src/exchange/blofin_client.py
+- **Description:** No way to retrieve a specific order by ID — the method didn't exist.
+- **Root Cause:** Architect didn't include this method in the interface.
+- **Resolution:** Added `get_order_by_id(order_id)` method that works for both paper trading (in-memory lookup) and live trading (API call).
+- **Notes:** Also added `_TRADE_QUERY_ORDER` endpoint constant.
+
+## [ISSUE-010] BloFin API field name corrections
+- **Status:** Resolved
+- **Severity:** High
+- **Agent:** Parent (direct fix)
+- **Created:** 2026-06-06 21:15 UTC
+- **Location:** src/exchange/blofin_client.py
+- **Description:** Multiple API field names were wrong:
+  - Order body: `ordType` → `orderType`, `sz` → `size`, `px` → `price`
+  - Balance response: `totalEq` → `totalEquity`, `availEq` → `details[0]['available']`
+  - Order response: `ordId` → `orderId` (data is a list, not dict)
+  - Ticker endpoint: `/market/ticker` → `/market/tickers`
+- **Root Cause:** BloFin API uses different field names than what Architect specified.
+- **Resolution:** Fixed all field mappings. Also changed `json=body` to `data=body_str.encode()` for proper serialization control.
+- **Notes:** Real demo trading now works — market buy + limit sell both executing successfully.
+
+## [ISSUE-011] Market order size calculation wrong
+- **Status:** Resolved
+- **Severity:** High
+- **Agent:** Parent (direct fix)
+- **Created:** 2026-06-06 21:15 UTC
+- **Location:** src/exchange/blofin_client.py:place_order
+- **Description:** Market order size was computed as `quantity * price` (USDT notional), which is correct for the API. But the size parameter was passed as a float string instead of integer.
+- **Root Cause:** The API requires integer size values. `size=60.0` works but `size=60` is cleaner.
+- **Resolution:** Converted size to integer string: `str(int(order.quantity * price))`.
+- **Notes:** For market orders: size = quantity_BTC * price_USDT (USDT notional). For limit orders: size = quantity_BTC * 1000 (mBTC).

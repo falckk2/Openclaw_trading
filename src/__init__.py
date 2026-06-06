@@ -1,0 +1,1 @@
+"""Blofin Trading Bot — src package."""

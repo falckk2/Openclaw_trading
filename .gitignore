@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+*.session
+logs/
+*.log
+token_budget.json
+*.egg-info/
+dist/
+build/
+.DS_Storeconfig.yaml

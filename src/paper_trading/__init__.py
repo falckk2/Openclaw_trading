@@ -1,0 +1,1 @@
+"""Paper trading module — simulated order execution without real money."""
