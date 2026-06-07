@@ -7,7 +7,7 @@
 - **Secrets:** config/config.yaml NOT committed (in .gitignore)
 
 ## Test Results
-- **49 passed, 3 skipped** (live API tests need funded demo account)
+- **52 passed** (live API tests need funded demo account)
 - All module tests passing
 
 ## What's Working
@@ -60,7 +60,7 @@
 | models/inference.py | ✅ | New — 3-layer DNN |
 | models/features/builder.py | ✅ | |
 | models/trainer.py | ✅ | |
-| Tests (49) | ✅ | All passing |
+| Tests (52) | ✅ | All passing |
 
 ## Bugs Fixed (9 total)
 1. ✅ OrderResponse missing `quantity` (Critical)
@@ -89,4 +89,4 @@
 - **Engineer** ✅ — API integration + live execution test
 - **BugFinder** ✅ — 9 bugs found
 - **Debugger** ✅ — Fixed all bugs
-- **Tester** ✅ — 49 tests passing
+- **Tester** ✅ — 52 tests passing
