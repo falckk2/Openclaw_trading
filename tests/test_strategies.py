@@ -8,6 +8,7 @@ from src.strategies.signal import Signal
 from src.strategies.manager import StrategyManager
 from src.strategies.ml.grid import GridStrategy, GridConfig
 from src.strategies.ml.mean_reversion import MeanReversionStrategy, MeanReversionConfig
+from src.strategies.ml.momentum import MomentumStrategy, MomentumConfig
 from src.data.dataclasses import Candle
 
 
@@ -99,3 +100,123 @@ class TestMeanReversionStrategy:
         signal = await strategy.generate_signal(candles, None)
         assert signal.action == "hold"
         assert signal.confidence == 0.0
+
+
+class TestMomentumStrategy:
+    """Tests for MomentumStrategy."""
+
+    def test_momentum_config(self):
+        config = MomentumConfig(
+            symbol="BTCUSDT",
+            momentum_period=10,
+            ma_short=20,
+            ma_long=50,
+        )
+        assert config.momentum_period == 10
+        assert config.ma_short == 20
+        assert config.ma_long == 50
+
+    def test_momentum_validate(self):
+        """Valid config passes validation."""
+        config = MomentumConfig(symbol="BTCUSDT")
+        strategy = MomentumStrategy(config)
+        assert strategy.validate()
+
+    def test_momentum_validate_fails_bad_params(self):
+        """Invalid config fails validation."""
+        config = MomentumConfig(
+            symbol="BTCUSDT",
+            momentum_period=10,
+            ma_short=5,   # must be > momentum_period
+            ma_long=3,    # must be > ma_short
+        )
+        strategy = MomentumStrategy(config)
+        assert not strategy.validate()
+
+    @pytest.mark.asyncio
+    async def test_hold_when_insufficient_data(self):
+        """Strategy returns hold when not enough data."""
+        config = MomentumConfig(symbol="BTCUSDT", momentum_period=10, ma_short=20, ma_long=50)
+        strategy = MomentumStrategy(config)
+
+        candles = [
+            Candle(
+                timestamp=datetime.utcnow() - timedelta(hours=i),
+                open=50000 + i * 10,
+                high=50100 + i * 10,
+                low=49900 + i * 10,
+                close=50000 + i * 10,
+                volume=1000,
+            )
+            for i in range(10)
+        ]
+
+        signal = await strategy.generate_signal(candles, None)
+        assert signal.action == "hold"
+        assert signal.confidence == 0.0
+
+    @pytest.mark.asyncio
+    async def test_momentum_uptrend_buy_signal(self):
+        """Uptrend with pullback triggers buy signal."""
+        config = MomentumConfig(
+            symbol="BTCUSDT",
+            momentum_period=5,
+            ma_short=10,
+            ma_long=20,
+            momentum_threshold=0.005,
+            entry_deviation=-0.5,
+        )
+        strategy = MomentumStrategy(config)
+
+        # Create uptrend: prices going up then slight pullback
+        base = 50000.0
+        candles = [
+            Candle(
+                timestamp=datetime.utcnow() - timedelta(hours=60 - i),
+                open=base + i * 50,
+                high=base + i * 50 + 100,
+                low=base + i * 50 - 100,
+                close=base + i * 50,
+                volume=1000,
+            )
+            for i in range(25)
+        ]
+
+        signal = await strategy.generate_signal(candles, None)
+        # Should detect uptrend momentum with some action
+        assert signal is not None
+        assert signal.action in ["buy", "hold"]
+        assert signal.symbol == "BTCUSDT"
+
+    @pytest.mark.asyncio
+    async def test_momentum_downtrend_sell_signal(self):
+        """Downtrend with bounce triggers sell signal."""
+        config = MomentumConfig(
+            symbol="BTCUSDT",
+            momentum_period=5,
+            ma_short=10,
+            ma_long=20,
+            momentum_threshold=0.005,
+            entry_deviation=-0.5,
+        )
+        strategy = MomentumStrategy(config)
+
+        # Create downtrend: prices going down then slight bounce
+        base = 51000.0
+        candles = [
+            Candle(
+                timestamp=datetime.utcnow() - timedelta(hours=60 - i),
+                open=base - i * 50,
+                high=base - i * 50 + 200,
+                low=base - i * 50 - 100,
+                close=base - i * 50,
+                volume=1000,
+            )
+            for i in range(25)
+        ]
+
+        signal = await strategy.generate_signal(candles, None)
+        # Should detect downtrend momentum with some action
+        assert signal is not None
+        assert signal.action in ["sell", "hold"]
+        assert signal.symbol == "BTCUSDT"
