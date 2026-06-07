@@ -329,6 +329,9 @@ class BlofinClient(ExchangeClient):
 
     async def get_positions(self) -> list[Position]:
         """Get all open positions."""
+        # Paper trading without API keys — return empty positions list
+        if self._paper_trading and not self._api_key:
+            return []
         data = await self._request("GET", _TRADE_POSITIONS, signed=True)
         return [
             Position(

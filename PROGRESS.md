@@ -70,9 +70,10 @@
 9. ✅ Paper trading market order avg_price=0 (High) — now fetches real ticker price
 
 ## Demo Account Status
-- **Balance:** 0.0 USDT (needs virtual funds)
-- **Market data:** live (BTC-USDT ~60667)
+- **Balance:** ~10,000 USDT (paper trading demo account)
+- **Market data:** live (BTC-USDT ~61,475)
 - **Orders:** working in paper mode (simulated fills)
+- **Live execution:** ✅ verified end-to-end (open position → ATR stop → update → close)
 
 ## Next Steps
 1. User funds demo account → real paper trades execute
@@ -83,7 +84,7 @@
 
 ## Agent Roster
 - **Architect** ✅ — SOLID structure
-- **Engineer** ✅ — API integration
+- **Engineer** ✅ — API integration + live execution test
 - **BugFinder** ✅ — 8 bugs found
 - **Debugger** ✅ — Fixed signature + market price bugs
-- **Tester** ✅ — 22 tests passing
+- **Tester** ✅ — 49 tests passing

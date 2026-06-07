@@ -27,6 +27,15 @@ Each issue follows this structure:
 
 ## Open Issues
 
+## [ISSUE-NEW-01] MomentumStrategy added — momentum + mean reversion hybrid
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (this session)
+- **Created:** 2026-06-07 01:57 UTC
+- **Location:** src/strategies/ml/momentum.py
+- **Description:** New MomentumStrategy combines trend momentum with mean reversion entry timing. Buys on upward momentum with pullback, sells on downward momentum with bounce. Includes MA crossover, ATR-based deviation, and configurable thresholds.
+- **Resolution:** MomentumStrategy implemented with generate_signal() method. Config dataclass: MomentumConfig. Required features: ["close"].
+
 
 ---
 
@@ -203,6 +212,33 @@ Each issue follows this structure:
 - **Root Cause:** BloFin API uses different field names than what Architect specified.
 - **Resolution:** Fixed all field mappings. Also changed `json=body` to `data=body_str.encode()` for proper serialization control.
 - **Notes:** Real demo trading now works — market buy + limit sell both executing successfully.
+
+## [ISSUE-012] ATR-based dynamic stop loss in Position
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (this session)
+- **Created:** 2026-06-07 01:57 UTC
+- **Location:** src/trading/position.py
+- **Description:** Added ATR-based dynamic stop loss to Position class: calculate_atr(), update_stop_loss_atr(), check_stop_loss_triggered(), set_take_profit_atr(), check_take_profit_triggered(), get_risk_reward_ratio(), get_stop_loss_distance_pct(). Supports trailing stops.
+- **Resolution:** Implemented with configurable ATR period (default 14) and multiplier (default 2.0). Tested with live BTC-USDT data.
+
+## [ISSUE-013] DNN inference model (3-layer feedforward)
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (this session)
+- **Created:** 2026-06-07 01:57 UTC
+- **Location:** src/models/inference.py
+- **Description:** Added DNNInferenceModel — a simple 3-layer feedforward neural network (input→64→32→3 softmax) for price direction prediction. Supports training with mini-batch SGD and save/load to JSON.
+- **Resolution:** Implemented predict(), predict_direction(), train(), save(), load(). Tests cover forward pass, direction prediction, save/load, and training.
+
+## [ISSUE-014] Live execution loop verified end-to-end
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent + Engineer (this session)
+- **Created:** 2026-06-07 01:57 UTC
+- **Location:** test_live_execution.py
+- **Description:** Full end-to-end live execution test: connect to demo API → fetch real candles → generate MomentumStrategy signal → open position → update price → set ATR stop loss + take profit → verify tracking → close position. All steps passed.
+- **Resolution:** Test script test_live_execution.py created and verified. ATR stop at 60744.20, TP at 62571.20, RR ratio 1.50 for BTC-USDT long position at 61475.
 
 ## [ISSUE-011] Market order size calculation wrong
 - **Status:** Resolved
