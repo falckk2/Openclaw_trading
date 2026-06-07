@@ -349,6 +349,14 @@ class BlofinClient(ExchangeClient):
 
     async def get_balance(self) -> Balance:
         """Get account balance."""
+        # Paper trading without API keys — return a mock balance
+        if self._paper_trading and not self._api_key:
+            return Balance(
+                total_equity=10000.0,
+                available=10000.0,
+                used_margin=0.0,
+                unrealized_pnl=0.0,
+            )
         data = await self._request("GET", _ACCOUNT_BALANCE, signed=True)
         b = data.get("data", {})
         detail = b.get("details", [{}])[0]
