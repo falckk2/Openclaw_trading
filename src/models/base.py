@@ -1,6 +1,7 @@
 """Base model class for ML/DL models."""
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 import numpy as np
 
 
@@ -13,9 +14,6 @@ class TrainingResult:
     recall: float
     f1: float
     training_time_seconds: float
-
-
-from dataclasses import dataclass as dc
 
 
 class ModelBase(ABC):
