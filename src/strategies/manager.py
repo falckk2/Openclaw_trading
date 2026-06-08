@@ -61,3 +61,8 @@ class StrategyManager:
         if not strategy or not strategy.validate():
             return None
         return await strategy.generate_signal(candles, position)
+
+    def get_strategy_config(self, name: str) -> StrategyConfig | None:
+        """Get config for a strategy."""
+        strategy = self._strategies.get(name)
+        return strategy._config if strategy else None

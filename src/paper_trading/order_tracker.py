@@ -51,3 +51,4 @@ class SimulatedTrade:
     fee: float
     opened_at: datetime
     closed_at: datetime
+    strategy_name: str = ""  # which strategy generated this trade

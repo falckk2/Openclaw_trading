@@ -20,6 +20,7 @@ class PaperTradingEngine:
         self._balance = initial_balance
         self._available = initial_balance
         self._positions: dict[str, SimulatedPosition] = {}
+        self._position_strategies: dict[str, str] = {}  # symbol -> strategy_name
         self._trades: list[SimulatedTrade] = []
         self._fills: list[SimulatedFill] = []
 
@@ -95,15 +96,14 @@ class PaperTradingEngine:
 
         return fill
 
-    def _execute_sell(self, symbol: str, qty: float, price: float) -> SimulatedFill:
-        """Execute a simulated sell."""
+    def _execute_sell(self, symbol: str, qty: float, price: float, strategy_name: str = "") -> SimulatedFill:
+        """Execute a simulated sell. Does NOT create a trade — caller is responsible for that."""
         pos = self._positions.get(symbol)
         if not pos or pos.quantity < qty:
             raise ValueError(f"Cannot sell {qty} of {symbol}: only {pos.quantity if pos else 0} available")
 
         revenue = qty * price
         fee = revenue * self.FEE_RATE
-        pnl = (price - pos.entry_price) * qty - fee
 
         fill = SimulatedFill(
             order_id=f"paper_{uuid.uuid4().hex[:8]}",
@@ -116,6 +116,7 @@ class PaperTradingEngine:
         self._fills.append(fill)
 
         # Update balance
+        pnl = (price - pos.entry_price) * qty - fee
         self._available += (revenue - fee)
         self._balance += pnl
 
@@ -123,21 +124,6 @@ class PaperTradingEngine:
         pos.quantity -= qty
         if pos.quantity <= 0:
             del self._positions[symbol]
-
-        # Record trade
-        trade = SimulatedTrade(
-            trade_id=f"paper_trade_{uuid.uuid4().hex[:8]}",
-            symbol=symbol,
-            side="sell",
-            quantity=qty,
-            entry_price=pos.entry_price,
-            exit_price=price,
-            pnl=pnl,
-            fee=fee,
-            opened_at=pos.opened_at,
-            closed_at=datetime.utcnow(),
-        )
-        self._trades.append(trade)
 
         return fill
 
@@ -167,18 +153,62 @@ class PaperTradingEngine:
 
     # ── LSP compatibility — same interface as TradingEngine ────────
 
-    async def open_position(self, symbol: str, side: str, qty: float, price: float | None = None):
+    async def open_position(self, symbol: str, side: str, qty: float, price: float | None = None, strategy_name: str = ""):
         """Open a simulated position (LSP-compatible with TradingEngine)."""
         if side == "long":
-            return await self.simulate_market_buy(symbol, qty) if price is None else await self.simulate_limit_buy(symbol, qty, price)
+            fill = await self.simulate_market_buy(symbol, qty) if price is None else await self.simulate_limit_buy(symbol, qty, price)
         else:
-            return await self.simulate_market_sell(symbol, qty) if price is None else await self.simulate_limit_sell(symbol, qty, price)
+            fill = await self.simulate_market_sell(symbol, qty) if price is None else await self.simulate_limit_sell(symbol, qty, price)
+        if strategy_name:
+            self._position_strategies[symbol] = strategy_name
+        return fill
 
-    async def close_position(self, symbol: str):
+    async def close_position(self, symbol: str, strategy_name: str = ""):
         """Close a simulated position."""
         pos = self._positions.get(symbol)
-        if pos:
-            return await self.simulate_market_sell(symbol, pos.quantity)
+        if not pos:
+            return None
+        qty = pos.quantity
+        entry_price = pos.entry_price
+        opened_at = pos.opened_at
+        symbol_local = pos.symbol
+        ticker = await self._exchange.get_ticker(symbol)
+        price = ticker.bid
+        self._execute_sell(symbol, qty, price)
+        strategy = strategy_name or self._position_strategies.get(symbol, "")
+        self._record_trade(symbol_local, qty, entry_price, opened_at, price, strategy)
+        if symbol in self._position_strategies:
+            del self._position_strategies[symbol]
+        return True
+
+    def _record_trade(
+        self,
+        symbol: str,
+        qty: float,
+        entry_price: float,
+        opened_at: datetime,
+        exit_price: float,
+        strategy_name: str,
+    ) -> None:
+        """Record a completed trade with P&L."""
+        entry_cost = qty * entry_price
+        exit_revenue = qty * exit_price
+        total_fees = entry_cost * self.FEE_RATE + exit_revenue * self.FEE_RATE
+        pnl = exit_revenue - entry_cost - total_fees
+        trade = SimulatedTrade(
+            trade_id=f"paper_trade_{uuid.uuid4().hex[:8]}",
+            symbol=symbol,
+            side="sell",
+            quantity=qty,
+            entry_price=entry_price,
+            exit_price=exit_price,
+            pnl=pnl,
+            fee=total_fees,
+            opened_at=opened_at,
+            closed_at=datetime.utcnow(),
+            strategy_name=strategy_name,
+        )
+        self._trades.append(trade)
 
     def get_total_unrealized_pnl(self) -> float:
         return sum(p.unrealized_pnl for p in self._positions.values())

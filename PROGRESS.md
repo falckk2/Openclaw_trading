@@ -7,7 +7,7 @@
 - **Secrets:** config/config.yaml NOT committed (in .gitignore)
 
 ## Test Results
-- **52 passed** (live API tests need funded demo account)
+- **59 passed** (52 original + 7 new strategy attribution tests)
 - All module tests passing
 
 ## What's Working
@@ -51,7 +51,10 @@
 | trading/engine.py | ✅ | |
 | trading/position.py | ✅ | ATR stop loss + trailing |
 | trading/order_manager.py | ✅ | |
-| paper_trading/simulator.py | ✅ | |
+| paper_trading/simulator.py | ✅ | Strategy attribution on open/close |
+| paper_trading/order_tracker.py | ✅ | `strategy_name` field on SimulatedTrade |
+| logging/performance_logger.py | ✅ | Per-strategy aggregation + comparison |
+| strategies/manager.py | ✅ | `get_strategy_config()` helper |
 | paper_trading/order_tracker.py | ✅ | |
 | strategies/grid.py | ✅ | |
 | strategies/mean_reversion.py | ✅ | |
@@ -60,7 +63,8 @@
 | models/inference.py | ✅ | New — 3-layer DNN |
 | models/features/builder.py | ✅ | |
 | models/trainer.py | ✅ | |
-| Tests (52) | ✅ | All passing |
+| Tests (59) | ✅ | All passing |
+| test_performance.py | ✅ | 7 new tests for strategy attribution |
 
 ## Bugs Fixed (9 total)
 1. ✅ OrderResponse missing `quantity` (Critical)
@@ -74,6 +78,7 @@
 9. ✅ Paper trading market order avg_price=0 (High)
 
 ## New Features Added
+- **Per-Strategy Performance Evaluation** — each trade is attributed to the strategy that opened it; `PerformanceLogger.get_strategy_performance()` computes P&L, win rate, Sharpe ratio, std dev, best/worst trade per strategy; `get_strategy_comparison()` ranks strategies head-to-head
 - **MomentumStrategy** — hybrid momentum + mean reversion (src/strategies/ml/momentum.py)
 - **ATR-based dynamic stop loss** — trailing stop, risk/reward, TP based on ATR (src/trading/position.py)
 - **DNNInferenceModel** — 3-layer feedforward network for price direction (src/models/inference.py)
