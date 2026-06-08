@@ -62,7 +62,7 @@ class CandleStorage:
         interval: str,
         start_time: datetime | None = None,
         end_time: datetime | None = None,
-        limit: int = 1000
+        limit: int = 500
     ) -> list[Candle]:
         """Retrieve candles from storage."""
         query = "SELECT timestamp, open, high, low, close, volume FROM candles WHERE symbol=? AND interval=?"

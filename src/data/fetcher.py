@@ -15,7 +15,7 @@ class DataFetcher:
         self._exchange = exchange
         self._cache = cache or DataCache()
 
-    async def get_candles(self, symbol: str, interval: str, limit: int = 100) -> list[Candle]:
+    async def get_candles(self, symbol: str, interval: str, limit: int = 50) -> list[Candle]:
         """Get historical candles, using cache when possible."""
         cache_key = f"candles:{symbol}:{interval}:{limit}"
         cached = self._cache.get(cache_key)
@@ -35,7 +35,7 @@ class DataFetcher:
         async for candle in self._exchange.stream_candles(symbol, interval):
             yield candle
 
-    def get_cached_candles(self, symbol: str, interval: str, limit: int = 100) -> list[Candle] | None:
+    def get_cached_candles(self, symbol: str, interval: str, limit: int = 50) -> list[Candle] | None:
         """Get cached candles if available."""
         cache_key = f"candles:{symbol}:{interval}:{limit}"
         return self._cache.get(cache_key)

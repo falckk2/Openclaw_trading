@@ -131,7 +131,7 @@ async def run_trading_loop(components: dict, symbols: list[str], interval: str =
         try:
             for symbol in symbols:
                 # Get candles
-                candles = await fetcher.get_candles(symbol, interval, limit=100)
+                candles = await fetcher.get_candles(symbol, interval, limit=50)
                 if not candles:
                     continue
 
