@@ -25,17 +25,23 @@ Each issue follows this structure:
 
 ---
 
-## Open Issues
-
-## [ISSUE-NEW-01] MomentumStrategy added — momentum + mean reversion hybrid
+## [ISSUE-015] Session reset 2026-06-09 12:27 UTC — verification
 - **Status:** Resolved
 - **Severity:** Info
 - **Agent:** Parent (this session)
-- **Created:** 2026-06-07 01:57 UTC
-- **Location:** src/strategies/ml/momentum.py
-- **Description:** New MomentumStrategy combines trend momentum with mean reversion entry timing. Buys on upward momentum with pullback, sells on downward momentum with bounce. Includes MA crossover, ATR-based deviation, and configurable thresholds.
-- **Resolution:** MomentumStrategy implemented with generate_signal() method. Config dataclass: MomentumConfig. Required features: ["close"].
+- **Created:** 2026-06-09 12:27 UTC
+- **Location:** All modules
+- **Description:** 5-hour reset session. Verified all 59 tests passing. Confirmed all features implemented: MomentumStrategy, ATR stop loss, DNN inference, live execution loop. Working tree clean.
+- **Resolution:** No changes needed — all features verified.
+- **Notes:** Balance ~49,600 USDT demo account. Live execution test script exists at test_live_execution.py. API key issue (ISSUE-008) remains open — user needs to generate API-compatible demo keys.
 
+---
+
+## Open Issues
+
+No open issues requiring code changes.
+
+**ISSUE-008** (API key) requires user action: generate API-compatible demo keys from Blofin account settings.
 
 ---
 
