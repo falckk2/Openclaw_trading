@@ -1,7 +1,7 @@
 """Performance logger — logs daily/weekly performance summaries."""
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +41,7 @@ class PerformanceLogger:
             "unrealized_pnl": unrealized_pnl,
             "equity": equity,
             "strategy_pnl": strategy_pnl or {},
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         })
 
     def log_trade_summary(self, trade: SimulatedTrade) -> None:
@@ -60,7 +60,7 @@ class PerformanceLogger:
             "opened_at": trade.opened_at.isoformat(),
             "closed_at": trade.closed_at.isoformat(),
             "duration_seconds": (trade.closed_at - trade.opened_at).total_seconds(),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         })
 
     def get_performance_stats(self, days: int = 7) -> dict:
@@ -70,7 +70,7 @@ class PerformanceLogger:
             return {}
 
         summaries = []
-        cutoff = datetime.utcnow() - timedelta(days=days)
+        cutoff = datetime.now(UTC) - timedelta(days=days)
         with open(path) as f:
             for line in f:
                 entry = json.loads(line)
@@ -99,7 +99,7 @@ class PerformanceLogger:
         if not path.exists():
             return {}
 
-        cutoff = datetime.utcnow() - timedelta(days=days)
+        cutoff = datetime.now(UTC) - timedelta(days=days)
         by_strategy: dict[str, list[dict]] = {}
 
         with open(path) as f:

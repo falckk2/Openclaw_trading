@@ -9,7 +9,7 @@ from src.trading.order_manager import OrderManager, TrackedOrder
 from src.config.dataclasses import RiskConfig
 from src.exchange.base import ExchangeClient, OrderResponse
 from src.data.dataclasses import Candle
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 
 class TestPosition:
@@ -112,7 +112,7 @@ class TestPositionATR:
         # Create realistic candle data
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=14 - i),
+                timestamp=datetime.now(UTC) - timedelta(hours=14 - i),
                 open=50000 + i * 20,
                 high=50100 + i * 20,
                 low=49900 + i * 20,
@@ -141,7 +141,7 @@ class TestPositionATR:
 
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=i),
+                timestamp=datetime.now(UTC) - timedelta(hours=i),
                 open=50000,
                 high=50100,
                 low=49900,
@@ -169,7 +169,7 @@ class TestPositionATR:
 
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=14 - i),
+                timestamp=datetime.now(UTC) - timedelta(hours=14 - i),
                 open=50000 + i * 20,
                 high=50150 + i * 20,
                 low=49850 + i * 20,
@@ -201,7 +201,7 @@ class TestPositionATR:
 
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=14 - i),
+                timestamp=datetime.now(UTC) - timedelta(hours=14 - i),
                 open=50000 + i * 20,
                 high=50150 + i * 20,
                 low=49850 + i * 20,
@@ -266,7 +266,7 @@ class TestPositionATR:
 
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=14 - i),
+                timestamp=datetime.now(UTC) - timedelta(hours=14 - i),
                 open=50000 + i * 20,
                 high=50150 + i * 20,
                 low=49850 + i * 20,
@@ -297,7 +297,7 @@ class TestPositionATR:
 
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=14 - i),
+                timestamp=datetime.now(UTC) - timedelta(hours=14 - i),
                 open=50000 + i * 20,
                 high=50150 + i * 20,
                 low=49850 + i * 20,

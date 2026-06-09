@@ -66,7 +66,7 @@
 | Tests (59) | ✅ | All passing |
 | test_performance.py | ✅ | 7 new tests for strategy attribution |
 
-## Bugs Fixed (9 total)
+## Bugs Fixed (10 total)
 1. ✅ OrderResponse missing `quantity` (Critical)
 2. ✅ Position.get_pnl_pct() stale value (Medium)
 3. ✅ MeanReversionStrategy missing __init__ (High)
@@ -76,9 +76,11 @@
 7. ✅ numpy not installed (Info)
 8. ✅ HMAC signature format wrong (Critical)
 9. ✅ Paper trading market order avg_price=0 (High)
+10. ✅ datetime.utcnow() deprecation warnings (Low) — replaced with datetime.now(UTC) across all source and test files
 
 ## New Features Added
 - **Per-Strategy Performance Evaluation** — each trade is attributed to the strategy that opened it; `PerformanceLogger.get_strategy_performance()` computes P&L, win rate, Sharpe ratio, std dev, best/worst trade per strategy; `get_strategy_comparison()` ranks strategies head-to-head
+- **datetime.utcnow() deprecation fixed** — replaced with `datetime.now(UTC)` across all source and test files (10 files updated). Remaining 37 warnings are from pytest internals (mock framework), not fixable from project code.
 - **MomentumStrategy** — hybrid momentum + mean reversion (src/strategies/ml/momentum.py)
 - **ATR-based dynamic stop loss** — trailing stop, risk/reward, TP based on ATR (src/trading/position.py)
 - **DNNInferenceModel** — 3-layer feedforward network for price direction (src/models/inference.py)

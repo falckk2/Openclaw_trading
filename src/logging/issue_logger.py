@@ -1,7 +1,7 @@
 """Issue logger — writes issues to issues.md in standardized format."""
 
 import re
-from datetime import datetime
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Literal
 
@@ -92,7 +92,7 @@ class IssueLogger:
 - **Status:** {issue.status}
 - **Severity:** {issue.severity}
 - **Agent:** {issue.agent}
-- **Created:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}
+- **Created:** {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}
 - **Location:** {issue.location}
 - **Description:** {issue.description}{root_cause}{resolution}{notes}
 """

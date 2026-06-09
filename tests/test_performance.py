@@ -1,7 +1,7 @@
 """Tests for strategy performance attribution."""
 
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from unittest.mock import AsyncMock, MagicMock
 
 from src.paper_trading.simulator import PaperTradingEngine
@@ -24,7 +24,7 @@ class MockExchange:
             bid=price - 0.01,
             ask=price + 0.01,
             volume=1000.0,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
         )
 
     def set_price(self, symbol: str, price: float):
@@ -116,7 +116,7 @@ class TestPerformanceLogger:
 
     def test_strategy_comparison_ranking(self, logger, tmp_path):
         """Strategy comparison should rank by total P&L."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Log trades for two strategies
         for i, strategy in enumerate(["GridStrategy", "RSI+Bollinger"]):
@@ -149,7 +149,7 @@ class TestPerformanceLogger:
 
     def test_strategy_performance_includes_sharpe(self, logger, tmp_path):
         """Per-strategy stats include Sharpe ratio."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         for i in range(5):
             trade = SimulatedTrade(
@@ -178,7 +178,7 @@ class TestPerformanceLogger:
 
     def test_unknown_strategy_for_legacy_trades(self, logger, tmp_path):
         """Trades logged before strategy_name field get 'unknown' attribution."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Legacy trade (no strategy_name field)
         trade = SimulatedTrade(

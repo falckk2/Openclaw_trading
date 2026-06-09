@@ -1,7 +1,7 @@
 """Strategy signal dataclass."""
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Literal
 
 
@@ -23,7 +23,7 @@ class Signal:
     def hold(cls, strategy_name: str, symbol: str, confidence: float = 0.0) -> "Signal":
         """Create a hold signal (no action)."""
         return cls(
-            signal_id=f"sig_{datetime.utcnow().timestamp()}",
+            signal_id=f"sig_{datetime.now(UTC).timestamp()}",
             strategy_name=strategy_name,
             symbol=symbol,
             action="hold",

@@ -1,7 +1,7 @@
 """Trade logger — logs every trade, signal, and P&L update."""
 
 import json
-from datetime import datetime
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +26,7 @@ class TradeLogger:
         """Log a trading signal."""
         self._log_event("signals.jsonl", {
             "type": "signal",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "signal_id": signal.signal_id,
             "strategy": signal.strategy_name,
             "symbol": signal.symbol,
@@ -42,7 +42,7 @@ class TradeLogger:
         """Log an order response."""
         self._log_event("orders.jsonl", {
             "type": "order",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "order_id": order.order_id,
             "symbol": order.symbol,
             "side": order.side,
@@ -56,7 +56,7 @@ class TradeLogger:
         """Log position state."""
         self._log_event("positions.jsonl", {
             "type": "position",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "symbol": position.symbol,
             "side": position.side,
             "entry_price": position.entry_price,
@@ -69,7 +69,7 @@ class TradeLogger:
         """Log P&L snapshot."""
         self._log_event("pnl.jsonl", {
             "type": "pnl",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "realized_pnl": realized,
             "unrealized_pnl": unrealized,
             "total_equity": total_equity,

@@ -1,7 +1,7 @@
 """Tests for strategies module."""
 
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 from src.strategies.base import Strategy, StrategyConfig
 from src.strategies.signal import Signal
@@ -54,7 +54,7 @@ class TestGridStrategy:
         base_price = 50000.0
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=i),
+                timestamp=datetime.now(UTC) - timedelta(hours=i),
                 open=base_price + i * 10,
                 high=base_price + i * 10 + 100,
                 low=base_price + i * 10 - 100,
@@ -87,7 +87,7 @@ class TestMeanReversionStrategy:
 
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=i),
+                timestamp=datetime.now(UTC) - timedelta(hours=i),
                 open=50000 + i * 10,
                 high=50100 + i * 10,
                 low=49900 + i * 10,
@@ -141,7 +141,7 @@ class TestMomentumStrategy:
 
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=i),
+                timestamp=datetime.now(UTC) - timedelta(hours=i),
                 open=50000 + i * 10,
                 high=50100 + i * 10,
                 low=49900 + i * 10,
@@ -172,7 +172,7 @@ class TestMomentumStrategy:
         base = 50000.0
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=60 - i),
+                timestamp=datetime.now(UTC) - timedelta(hours=60 - i),
                 open=base + i * 50,
                 high=base + i * 50 + 100,
                 low=base + i * 50 - 100,
@@ -205,7 +205,7 @@ class TestMomentumStrategy:
         base = 51000.0
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=60 - i),
+                timestamp=datetime.now(UTC) - timedelta(hours=60 - i),
                 open=base - i * 50,
                 high=base - i * 50 + 200,
                 low=base - i * 50 - 100,

@@ -6,7 +6,7 @@ import numpy as np
 from src.models.features.feature_builder import FeatureBuilder
 from src.models.inference import DNNInferenceModel
 from src.data.dataclasses import Candle
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 
 class TestFeatureBuilder:
@@ -16,7 +16,7 @@ class TestFeatureBuilder:
         """Feature matrix has correct shape."""
         candles = [
             Candle(
-                timestamp=datetime.utcnow() - timedelta(hours=i),
+                timestamp=datetime.now(UTC) - timedelta(hours=i),
                 open=50000 + i * 10,
                 high=50100 + i * 10,
                 low=49900 + i * 10,

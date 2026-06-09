@@ -116,14 +116,14 @@ Each issue follows this structure:
 - **Resolution:** Installed numpy with --break-system-packages flag.
 
 ## [ISSUE-INFO-03] datetime.utcnow() deprecation warnings
-- **Status:** Deferred
+- **Status:** Resolved
 - **Severity:** Low
-- **Agent:** —
+- **Agent:** Parent (this session)
 - **Created:** 2026-06-06 19:xx UTC
 - **Location:** Multiple files (50+ warnings)
 - **Description:** datetime.utcnow() deprecated in Python 3.12+. All strategies and tests use it. Should replace with datetime.now(datetime.UTC).
-- **Resolution:** Deferred — not blocking, 67 deprecation warnings but tests pass.
-- **Notes:** Easy fix for Engineer in next session.
+- **Resolution:** Replaced all datetime.utcnow() with datetime.now(datetime.UTC) across all source and test files.
+- **Notes:** Fixed in this session (2026-06-09).
 
 ---
 

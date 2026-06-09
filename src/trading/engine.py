@@ -1,7 +1,7 @@
 """Trading engine — manages positions, P&L, and order execution."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Literal
 
 from ..exchange.base import ExchangeClient, OrderRequest, OrderResponse, Position as ExchangePosition
@@ -54,7 +54,7 @@ class TradingEngine:
             entry_price=order_resp.avg_price or price or 0,
             quantity=qty,
             current_price=order_resp.avg_price or price or 0,
-            opened_at=datetime.utcnow(),
+            opened_at=datetime.now(UTC),
         )
         self._positions[symbol] = position
         return position

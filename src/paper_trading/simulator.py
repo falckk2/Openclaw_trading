@@ -1,7 +1,7 @@
 """Paper trading engine — simulates order execution using real market data."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 
 from ..exchange.base import ExchangeClient
 from .order_tracker import SimulatedFill, SimulatedPosition, SimulatedBalance, SimulatedTrade
@@ -205,7 +205,7 @@ class PaperTradingEngine:
             pnl=pnl,
             fee=total_fees,
             opened_at=opened_at,
-            closed_at=datetime.utcnow(),
+            closed_at=datetime.now(UTC),
             strategy_name=strategy_name,
         )
         self._trades.append(trade)
