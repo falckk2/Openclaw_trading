@@ -1,6 +1,7 @@
 """Model registry — versioned model storage and loading."""
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -15,9 +16,6 @@ class ModelInfo:
     path: Path
     trained_at: str
     accuracy: float | None = None
-
-
-from dataclasses import dataclass as dc
 
 
 class ModelRegistry:
