@@ -1,9 +1,14 @@
 # Blofin Trading Bot — Project Progress
 
-## Latest Session (2026-06-10 03:27 UTC)
-- **Verified:** All 59 tests passing
-- **Status:** Working tree clean — no code changes needed
-- **Note:** All features from previous session confirmed working
+## Latest Session (2026-06-10 08:27 UTC)
+- **Verified:** All 69 tests passing (59 original + 10 new strategy tests)
+- **Fixed:** RSI zero-division bug in RSIBollingerStrategy (all gains → avg_loss=0 → ZeroDivisionError)
+- **Added:** 10 new tests — MomentumStrategy edge cases, StrategyManager, RSIBollingerStrategy
+- **Live execution:** Engineer verified all 7 steps pass end-to-end
+- **Status:** Working tree clean
+
+## Bugs Fixed (11 total)
+11. ✅ RSI ZeroDivisionError in RSIBollingerStrategy (avg_loss=0 when all gains)
 
 ## GitHub
 - **Repo:** https://github.com/falckk2/Openclaw_trading
@@ -12,7 +17,7 @@
 - **Secrets:** config/config.yaml NOT committed (in .gitignore)
 
 ## Test Results
-- **59 passed** (52 original + 7 new strategy attribution tests)
+- **69 passed** (59 original + 10 new strategy tests)
 - All module tests passing
 
 ## What's Working
@@ -68,7 +73,7 @@
 | models/inference.py | ✅ | New — 3-layer DNN |
 | models/features/builder.py | ✅ | |
 | models/trainer.py | ✅ | |
-| Tests (59) | ✅ | All passing |
+| Tests (69) | ✅ | All passing |
 | test_performance.py | ✅ | 7 new tests for strategy attribution |
 
 ## Bugs Fixed (10 total)

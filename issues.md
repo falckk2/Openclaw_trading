@@ -49,6 +49,18 @@ Each issue follows this structure:
 
 ---
 
+## [ISSUE-017] Session reset 2026-06-10 08:27 UTC — live execution + new tests
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (this session) + Engineer (sub-agent)
+- **Created:** 2026-06-10 08:27 UTC
+- **Location:** All modules + tests/test_strategies.py + src/strategies/ml/rsi_bollinger.py
+- **Description:** 5-hour reset session. All 69 tests passing. Fixed RSI ZeroDivisionError bug in RSIBollingerStrategy. Added 10 new tests (MomentumStrategy edge cases, StrategyManager, RSIBollingerStrategy). Live execution loop verified end-to-end by Engineer sub-agent — all 7 steps passed (fetch candles → generate signal → open position → set ATR stop → simulate price moves → close position → report PnL).
+- **Resolution:** Fixed RSI ZeroDivisionError: added `if avg_loss == 0: return 100.0` guard. Added 10 new tests. Live execution verified.
+- **Notes:** Balance ~49,600 USDT demo account. API key issue (ISSUE-008) still open.
+
+---
+
 ## Open Issues
 
 No open issues requiring code changes.
