@@ -1,14 +1,22 @@
 # Blofin Trading Bot — Project Progress
 
-## Latest Session (2026-06-10 13:27 UTC)
-- **Verified:** All 69 tests passing (59 original + 10 new strategy tests)
-- **Fixed:** RSI zero-division bug in RSIBollingerStrategy (all gains → avg_loss=0 → ZeroDivisionError)
-- **Added:** 10 new tests — MomentumStrategy edge cases, StrategyManager, RSIBollingerStrategy
-- **Live execution:** Engineer verified all 7 steps pass end-to-end
-- **Status:** Working tree clean
+## Latest Session (2026-06-10 13:56 UTC)
+- **Added:** Evaluation, checkpoint, and leaderboard modules
+- **Added:** 34 new tests for checkpoint and metrics modules (103 total tests now)
+- **Added:** Cron jobs for daily evaluation and weekly leaderboard reports
+- **Status:** All 103 tests passing
 
-## Bugs Fixed (11 total)
-11. ✅ RSI ZeroDivisionError in RSIBollingerStrategy (avg_loss=0 when all gains)
+## New Modules Added
+
+### Evaluation Module (src/evaluation/)
+- **metrics.py** — Sharpe ratio, Sortino ratio, max drawdown, win rate, profit factor, expectancy
+- **evaluator.py** — StrategyEvaluator (backtesting, walk-forward), ModelEvaluator (cross-validation)
+- **leaderboard.py** — Agent ranking, head-to-head comparison, trend analysis
+- **checkpoint.py** — Model checkpointing with metadata, best model tracking, training history
+
+### Cron Jobs
+- **Daily Strategy Evaluation** — runs at 8am Stockholm time, updates rankings and logs performance
+- **Weekly Leaderboard Report** — runs Mondays at 9am Stockholm time, generates and sends report to Telegram
 
 ## GitHub
 - **Repo:** https://github.com/falckk2/Openclaw_trading
@@ -17,7 +25,7 @@
 - **Secrets:** config/config.yaml NOT committed (in .gitignore)
 
 ## Test Results
-- **69 passed** (59 original + 10 new strategy tests)
+- **103 passed** (69 original + 34 new tests for checkpoint/metrics)
 - All module tests passing
 
 ## What's Working
@@ -52,6 +60,13 @@
 - FeatureBuilder — RSI, Bollinger Bands, volatility, momentum
 - DNNInferenceModel — 3-layer feedforward (64→32→3) for price direction
 - Trainer — mini-batch gradient descent with cross-entropy loss
+- CheckpointManager — model checkpointing with metadata tracking
+
+### Evaluation & Leaderboard (✅)
+- PerformanceLogger — per-strategy aggregation and comparison
+- StrategyEvaluator — backtesting and walk-forward analysis
+- ModelEvaluator — cross-validation for ML models
+- Leaderboard — multi-metric ranking, trend analysis, head-to-head comparison
 
 ## Module Status
 
@@ -65,18 +80,22 @@
 | paper_trading/order_tracker.py | ✅ | `strategy_name` field on SimulatedTrade |
 | logging/performance_logger.py | ✅ | Per-strategy aggregation + comparison |
 | strategies/manager.py | ✅ | `get_strategy_config()` helper |
-| paper_trading/order_tracker.py | ✅ | |
 | strategies/grid.py | ✅ | |
 | strategies/mean_reversion.py | ✅ | |
 | strategies/rsi_bollinger.py | ✅ | |
-| strategies/ml/momentum.py | ✅ | New — momentum + reversion hybrid |
-| models/inference.py | ✅ | New — 3-layer DNN |
+| strategies/ml/momentum.py | ✅ | Momentum + reversion hybrid |
+| models/inference.py | ✅ | 3-layer DNN |
+| models/checkpoint.py | ✅ | New — model checkpointing |
 | models/features/builder.py | ✅ | |
 | models/trainer.py | ✅ | |
-| Tests (69) | ✅ | All passing |
-| test_performance.py | ✅ | 7 new tests for strategy attribution |
+| evaluation/metrics.py | ✅ | New — Sharpe, Sortino, drawdown |
+| evaluation/evaluator.py | ✅ | New — backtesting, walk-forward |
+| evaluation/leaderboard.py | ✅ | New — agent ranking |
+| Tests (103) | ✅ | All passing |
+| test_checkpoint.py | ✅ | New — 9 tests |
+| test_metrics.py | ✅ | New — 25 tests |
 
-## Bugs Fixed (10 total)
+## Bugs Fixed (11 total)
 1. ✅ OrderResponse missing `quantity` (Critical)
 2. ✅ Position.get_pnl_pct() stale value (Medium)
 3. ✅ MeanReversionStrategy missing __init__ (High)
@@ -86,14 +105,20 @@
 7. ✅ numpy not installed (Info)
 8. ✅ HMAC signature format wrong (Critical)
 9. ✅ Paper trading market order avg_price=0 (High)
-10. ✅ datetime.utcnow() deprecation warnings (Low) — replaced with datetime.now(UTC) across all source and test files
+10. ✅ datetime.utcnow() deprecation warnings (Low) — replaced with datetime.now(UTC)
+11. ✅ RSI ZeroDivisionError in RSIBollingerStrategy (avg_loss=0 when all gains)
 
 ## New Features Added
-- **Per-Strategy Performance Evaluation** — each trade is attributed to the strategy that opened it; `PerformanceLogger.get_strategy_performance()` computes P&L, win rate, Sharpe ratio, std dev, best/worst trade per strategy; `get_strategy_comparison()` ranks strategies head-to-head
-- **datetime.utcnow() deprecation fixed** — replaced with `datetime.now(UTC)` across all source and test files (10 files updated). Remaining 37 warnings are from pytest internals (mock framework), not fixable from project code.
-- **MomentumStrategy** — hybrid momentum + mean reversion (src/strategies/ml/momentum.py)
-- **ATR-based dynamic stop loss** — trailing stop, risk/reward, TP based on ATR (src/trading/position.py)
-- **DNNInferenceModel** — 3-layer feedforward network for price direction (src/models/inference.py)
+- **CheckpointManager** — saves trained model weights with metadata (accuracy, precision, recall, f1, training time); supports best model tracking and training history
+- **StrategyEvaluator** — backtesting with equity curve tracking, walk-forward analysis for robust performance estimation
+- **ModelEvaluator** — cross-validation support for ML models, confusion matrix calculation
+- **Leaderboard** — multi-metric ranking (P&L, Sharpe, win rate, drawdown), trend analysis, head-to-head comparison, weekly reports
+- **Metrics Module** — Sharpe ratio, Sortino ratio, max drawdown, profit factor, expectancy, trade statistics
+- **Cron Jobs** — daily evaluation (8am Stockholm) and weekly leaderboard report (Monday 9am Stockholm)
+- **Per-Strategy Performance Evaluation** — each trade is attributed to the strategy that opened it; `PerformanceLogger.get_strategy_performance()` computes P&L, win rate, Sharpe ratio, std dev, best/worst trade per strategy
+- **MomentumStrategy** — hybrid momentum + mean reversion strategy
+- **ATR-based dynamic stop loss** — trailing stop, risk/reward, TP based on ATR
+- **DNNInferenceModel** — 3-layer feedforward network for price direction
 
 ## Demo Account Status
 - **Balance:** ~49,600 USDT (paper trading demo account)
@@ -104,6 +129,7 @@
 ## Agent Roster
 - **Architect** ✅ — SOLID structure
 - **Engineer** ✅ — API integration + live execution test
-- **BugFinder** ✅ — 9 bugs found
+- **BugFinder** ✅ — 11 bugs found
 - **Debugger** ✅ — Fixed all bugs
-- **Tester** ✅ — 52 tests passing
+- **Tester** ✅ — 103 tests passing
+- **Evaluator** ✅ — New — performance measurement, checkpointing, leaderboard
