@@ -52,6 +52,8 @@ class RSIBollingerStrategy(Strategy):
 
         avg_gain = sum(gains) / len(gains) if gains else 0.001
         avg_loss = sum(losses) / len(losses) if losses else 0.001
+        if avg_loss == 0:
+            return 100.0  # all gains, RSI = 100
 
         rs = avg_gain / avg_loss
         return 100 - (100 / (1 + rs))
