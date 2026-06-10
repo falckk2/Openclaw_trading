@@ -37,6 +37,18 @@ Each issue follows this structure:
 
 ---
 
+## [ISSUE-016] Session reset 2026-06-10 03:27 UTC — verification
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (this session)
+- **Created:** 2026-06-10 03:27 UTC
+- **Location:** All modules
+- **Description:** 5-hour reset session. Verified all 59 tests passing. All features confirmed working: MomentumStrategy, ATR stop loss, DNN inference, live execution loop. Working tree clean. No code changes needed.
+- **Resolution:** No changes needed — all features verified.
+- **Notes:** Balance ~49,600 USDT demo account. API key issue (ISSUE-008) still open — user needs to generate API-compatible demo keys.
+
+---
+
 ## Open Issues
 
 No open issues requiring code changes.
