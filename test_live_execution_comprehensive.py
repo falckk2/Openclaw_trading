@@ -263,27 +263,35 @@ async def test_atr_stop_loss(engine: TradingEngine, candles) -> dict:
         print(f"  ✗ ATR stop loss test failed: {e}")
         import traceback; traceback.print_exc()
     
-    # Test ATR take profit
-    try:
-        tp = pos.set_take_profit_atr(candles, reward_multiplier=3.0)
-        print(f"  ✓ ATR take profit set (3x ATR): {tp:.2f}")
-        assert pos.take_profit is not None, "Take profit not set"
-        assert pos.take_profit > pos.current_price, "Long take profit should be above current price"
-        
-        # Check TP triggered
-        tp_triggered = pos.check_take_profit_triggered(pos.take_profit)
-        print(f"  ✓ check_take_profit_triggered at TP price: {tp_triggered}")
-        assert tp_triggered, "Take profit should trigger at TP price"
-        
-        # Risk/reward ratio
-        rr = pos.get_risk_reward_ratio()
-        print(f"  ✓ Risk/Reward ratio: {rr:.2f}")
-        assert rr is not None and rr > 0, "R/R ratio should be positive"
-        
-    except Exception as e:
-        errors.append(f"ATR take profit test failed: {e}")
-        print(f"  ✗ ATR take profit test failed: {e}")
-        import traceback; traceback.print_exc()
+        # Test ATR take profit
+        # TP is set relative to entry_price (risk-based). Current price may be above
+        # entry after the trailing stop test — check relative to entry instead.
+        try:
+            tp = pos.set_take_profit_atr(candles, reward_multiplier=3.0)
+            print(f"  ✓ ATR take profit set (3x ATR from entry={pos.entry_price:.2f}): {tp:.2f}")
+            assert pos.take_profit is not None, "Take profit not set"
+            assert pos.take_profit > pos.entry_price, "Long take profit should be above entry price"
+            print(f"    (Current price={pos.current_price:.2f}, TP is relative to entry — may be below current)")
+            
+            # Check TP triggered (when price reaches TP)
+            tp_triggered = pos.check_take_profit_triggered(pos.take_profit)
+            # Not triggered yet since current > TP is possible for long TP above entry
+            print(f"  ✓ check_take_profit_triggered at TP price: {tp_triggered} (TP={pos.take_profit:.2f}, current={pos.current_price:.2f})")
+            
+            # Manually trigger TP: check TP is set correctly by verifying at TP price
+            tp_at_tp_price = pos.check_take_profit_triggered(pos.take_profit)
+            assert tp_at_tp_price, "TP should trigger at TP price"
+            print(f"  ✓ TP triggers correctly at TP price")
+            
+            # Risk/reward ratio
+            rr = pos.get_risk_reward_ratio()
+            print(f"  ✓ Risk/Reward ratio: {rr:.2f}")
+            assert rr is not None and rr > 0, "R/R ratio should be positive"
+            
+        except Exception as e:
+            errors.append(f"ATR take profit test failed: {e}")
+            print(f"  ✗ ATR take profit test failed: {e}")
+            import traceback; traceback.print_exc()
     
     # Test short position ATR
     short_pos = engine.get_position("ETH-USDT")
@@ -313,8 +321,8 @@ async def test_order_tracking(client: BlofinClient, engine: TradingEngine) -> di
     errors = []
     
     try:
-        # Get tracked orders from order manager
-        open_orders = engine.order_manager.get_open_orders()
+        # Get tracked orders from order manager (private attribute)
+        open_orders = engine._order_manager.get_open_orders()
         print(f"  ✓ Order manager accessible, open orders: {len(open_orders)}")
         
         # Place a new limit order via client (paper trading)
@@ -331,17 +339,17 @@ async def test_order_tracking(client: BlofinClient, engine: TradingEngine) -> di
         print(f"  ✓ Limit order placed: id={resp.order_id}, filled={resp.filled_qty}, status={resp.status}")
         
         # Track it
-        tracked = engine.order_manager.track_order(resp)
+        tracked = engine._order_manager.track_order(resp)
         print(f"  ✓ Order tracked: id={tracked.order_id}, symbol={tracked.symbol}, side={tracked.side}")
         
         # Get order by ID
-        looked_up = engine.order_manager.get_order(resp.order_id)
+        looked_up = engine._order_manager.get_order(resp.order_id)
         assert looked_up is not None, "Order not found in tracker"
         assert looked_up.order_id == resp.order_id, "Order ID mismatch"
         print(f"  ✓ Order lookup by ID successful")
         
         # Get open orders for BTC-USDT
-        btc_orders = engine.order_manager.get_open_orders("BTC-USDT")
+        btc_orders = engine._order_manager.get_open_orders("BTC-USDT")
         print(f"  ✓ Open orders for BTC-USDT: {len(btc_orders)}")
         
     except Exception as e:
