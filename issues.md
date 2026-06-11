@@ -309,3 +309,13 @@ No open issues requiring code changes.
 - **Location:** All modules
 - **Description:** Session reset. All 103 tests verified passing. All features confirmed implemented.
 - **Resolution:** Verified all 6 priority tasks complete: MomentumStrategy ✅, ATR stop loss ✅, DNN inference ✅, live execution ✅, new tests ✅, docs updated ✅.
+
+## [ISSUE-020] Session reset 2026-06-11 04:27 UTC — verification
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent
+- **Created:** 2026-06-11 04:27 UTC
+- **Location:** All modules
+- **Description:** 5-hour reset session. All 103 tests passing. All features verified: MomentumStrategy, ATR stop loss, DNN inference, live execution loop, evaluation/leaderboard. Engineer sub-agent ran live execution test. Working tree clean.
+- **Resolution:** No code changes needed — all features verified.
+- **Notes:** Balance ~49,600 USDT demo account. API key issue (ISSUE-008) still open — user needs to generate API-compatible demo keys.
