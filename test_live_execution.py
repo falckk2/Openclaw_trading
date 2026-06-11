@@ -68,7 +68,7 @@ async def main():
     else:
         # Simulate a position for testing purposes (when signal is HOLD)
         print("     Creating a simulated position to test stop loss...")
-        from datetime import datetime
+        from datetime import datetime, UTC
         import uuid
         pos = Position(
             position_id=str(uuid.uuid4()),
@@ -77,7 +77,7 @@ async def main():
             entry_price=candles[-1].close,
             quantity=config.quantity,
             current_price=ticker.last,
-            opened_at=datetime.utcnow(),
+            opened_at=datetime.now(UTC),
         )
         engine._positions["BTC-USDT"] = pos
         print(f"     Simulated position: entry={pos.entry_price:.2f}, current={pos.current_price:.2f}")

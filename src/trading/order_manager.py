@@ -3,7 +3,7 @@
 import asyncio
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Literal
 
 from ..exchange.base import OrderResponse
@@ -20,7 +20,7 @@ class TrackedOrder:
     price: float | None
     filled_qty: float
     status: str
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class OrderManager:

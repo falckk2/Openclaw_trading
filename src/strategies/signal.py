@@ -17,7 +17,7 @@ class Signal:
     stop_loss: float | None = None
     take_profit: float | None = None
     metadata: dict = field(default_factory=dict)
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @classmethod
     def hold(cls, strategy_name: str, symbol: str, confidence: float = 0.0) -> "Signal":

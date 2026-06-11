@@ -1,7 +1,7 @@
 """Simulated order tracking for paper trading."""
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, UTC
 
 
 @dataclass
@@ -13,7 +13,7 @@ class SimulatedFill:
     price: float
     quantity: float
     fee: float
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -26,7 +26,7 @@ class SimulatedPosition:
     quantity: float
     current_price: float
     unrealized_pnl: float = 0.0
-    opened_at: datetime = field(default_factory=datetime.utcnow)
+    opened_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass

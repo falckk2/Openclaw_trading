@@ -1,7 +1,7 @@
 """Position dataclass for tracking open positions with dynamic stop loss."""
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Literal
 
 from ..data.dataclasses import Candle
@@ -18,7 +18,7 @@ class Position:
     current_price: float
     unrealized_pnl: float = 0.0
     realized_pnl: float = 0.0
-    opened_at: datetime = field(default_factory=datetime.utcnow)
+    opened_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     stop_loss: float | None = None
     take_profit: float | None = None
     # ATR-based dynamic stop loss fields
