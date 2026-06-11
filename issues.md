@@ -61,6 +61,18 @@ Each issue follows this structure:
 
 ---
 
+## [ISSUE-022] Session reset 2026-06-11 09:27 UTC — datetime fix + comprehensive live test
+- **Status:** Resolved
+- **Severity:** Info
+- **Agent:** Parent (this session)
+- **Created:** 2026-06-11 09:27 UTC
+- **Location:** src/paper_trading/order_tracker.py, src/trading/order_manager.py, src/trading/position.py, src/strategies/signal.py, test_live_execution.py
+- **Description:** 5-hour reset session. Fixed deprecated datetime.utcnow() → datetime.now(UTC) in 5 files (10 occurrences). All 103 tests pass with zero warnings. Spawned Engineer sub-agent for comprehensive live execution test of all strategies. Live execution verified: BTC-USDT price 62923.40, ATR stop 62106.56, TP 64148.66, RR 1.50.
+- **Resolution:** Fixed datetime deprecation warnings. All tests pass clean. Comprehensive live test in progress by Engineer sub-agent.
+- **Notes:** Balance ~49,600 USDT demo account. API key issue (ISSUE-008) still open.
+
+---
+
 ## Open Issues
 
 No open issues requiring code changes.
